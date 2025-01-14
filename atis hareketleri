@@ -1,0 +1,505 @@
+import numpy as np
+import math
+import tkinter as tk
+from tkinter.ttk import *
+from tkinter import messagebox
+
+
+
+
+ekran = tk.Tk()
+ekran.title("fizik projesi")
+ekran.geometry("500x500")
+g = 10
+
+t_bul = math.sqrt(2*g*1/2*g)
+işlev_listesi = ["yukarı yönde atış","aşağı yönde atış","bir yükseklikten atış","eğimli yatay atış"]
+class ana_işlev:
+    def __init__(self):
+        self.g = 10
+        self.çalışmamak = ""
+        self.düzen = 0
+        self.seçim_kutusu = Combobox(ekran)
+        self.seçim_kutusu['values'] = işlev_listesi
+        self.seçim_kutusu.current(0)
+        self.kabul_button = tk.Button(ekran,text="işlem",command=self.işleyiş)
+
+        self.h_label = tk.Label(ekran,text="h yüksekliği:")
+        self.t_label = tk.Label(ekran,text="zaman:")
+        self.v0_label = tk.Label(ekran,text="ilk hız:")
+        self.acı_label = tk.Label(ekran,text="atılma açısı:")
+        self.menzil_label = tk.Label(ekran,text="menzil:")
+
+        self.cikti = tk.Text(
+            ekran,
+            font=("helvetica", 10),
+            width=50,
+            height=15,
+            wrap="word"
+        )
+
+        self.t_giris = tk.Entry(ekran)
+        self.h_giris = tk.Entry(ekran)
+        self.v0_giris = tk.Entry(ekran)
+        self.acı_giris = tk.Entry(ekran)
+        self.menzil_giris = tk.Entry(ekran)
+        self.çıkış_buton = tk.Button(ekran,text="çıkış",command=self.işlev_seçimi)
+        self.giris_buton = tk.Button(ekran,text="işlem yap",command=self.yukarı_atıs)
+        self.aşağı_giris_buton = tk.Button(ekran,text="işlem yap",command=self.aşağı_yönde)
+        self.egim_button = tk.Button(ekran,text="işlem yap",command=self.egimli_atıs)
+        self.yükseklik_buton = tk.Button(ekran,text="işlem yap",command=self.yükseklik_atıs)
+
+    def silmek(self):
+        self.t_giris.place_forget()
+        self.h_giris.place_forget()
+        self.v0_giris.place_forget()
+        self.acı_giris.place_forget()
+        self.menzil_giris.place_forget()
+        
+        self.h_label.place_forget()
+        self.t_label.place_forget()
+        self.v0_label.place_forget()
+        self.acı_label.place_forget()
+        self.menzil_label.place_forget()
+
+        self.giris_buton.place_forget()
+        self.aşağı_giris_buton.place_forget()
+        self.kabul_button.place_forget()
+        self.egim_button.place_forget()
+        self.seçim_kutusu.place_forget()
+        self.yükseklik_buton.place_forget()
+        
+        
+
+    def işlev_seçimi(self):
+        self.silmek()
+        self.cikti.place_forget()
+        self.kabul_button.place(x=150,y=35)
+        self.seçim_kutusu.place(x=150,y=10)
+        self.çıkış_buton.place(x=300,y=20)
+    
+    def aşağı_yönde_giris(self):
+        self.silmek()
+        self.h_label.place(x=30,y=5)
+        self.h_giris.place(x=100,y=5)
+        self.t_label.place(x=30,y=30)
+        self.t_giris.place(x=100,y=30)
+        self.v0_label.place(x=30,y=55)
+        self.v0_giris.place(x=100,y=55)
+        self.aşağı_giris_buton.place(x=50,y=80)
+
+    def aşağı_yönde(self):
+        self.silmek()
+        v0 = self.v0_giris.get()
+        t = self.t_giris.get()
+        h = self.h_giris.get()
+
+        while not h or not t or not v0:
+            if not h:
+                if isinstance(v0,str):
+                    v0 = float(v0) if v0.strip() != "" else None
+                if isinstance(t, str):
+                    t = float(t) if t.strip() != "" else None
+                if t:
+                    h = 5 * (t**2)
+                
+
+            if not t:
+                if isinstance(h, str):
+                    h = float(h) if h.strip() != "" else None
+                if isinstance(t, str):
+                    t = float(t) if t.strip() != "" else None
+                if isinstance(v0, str):
+                    v0 = float(v0) if v0.strip() != "" else None
+
+                if h:
+                    t = math.sqrt(h / 5)
+                if v0:
+                    t = v0/t_bul
+
+            if not v0:
+                
+                if isinstance(h,str):
+                    h = float(h) if h.strip() != "" else None
+                if h:
+                    v0 = math.sqrt(2 * g * h)
+            
+        if isinstance(t,str):
+            t=float(t) if t.strip() !="" else None
+
+        v_son = g * t
+        self.cikti.place(x=30,y=150)
+        self.cikti.delete("1.0",tk.END)
+        self.cikti.insert(tk.END,f"sürtünmelerin önemsenmediği ortamda aşağıya atılan/bırakılan cisim için\n\nilk hız:{v0} m/s \n zaman:{t} s \n yükseklik: {h} m \n son hız:{v_son} m/s")#"\n","ilk hız:",v0,"\n","zaman:",t,"\n","hmax:",h,"\n","son hız:",v_son)
+        self.işleyiş()
+        
+    def yukarı_atıs_giris(self):
+        self.silmek()
+        self.h_label.place(x=30,y=5)
+        self.h_giris.place(x=100,y=5)
+        self.t_label.place(x=30,y=30)
+        self.t_giris.place(x=100,y=30)
+        self.v0_label.place(x=30,y=55)
+        self.v0_giris.place(x=100,y=55)
+        self.giris_buton.place(x=110,y=80)
+
+    def yukarı_atıs(self):
+        
+        t = self.t_giris.get() 
+        v0 = self.v0_giris.get() 
+        h = self.h_giris.get() 
+        while not t or not v0 or not h:
+            if not t:
+                if isinstance(t,str):
+                    t = float(t) if t.strip() != "" else None
+                if isinstance(v0,str):
+                    v0 = float(v0) if v0.strip() != "" else None 
+                if isinstance(h,str):
+                    h=float(h) if h.strip() !="" else None
+
+                if v0:
+                    t = 2 * v0 / g
+                if h:
+                    t = math.sqrt((2*h)/g)
+            
+            if not v0:
+                if isinstance(v0,str):
+                    v0 = float(v0) if v0.strip() != "" else None
+                if isinstance(t,str):
+                    t=float(t) if t.strip() != "" else None
+                if isinstance(h,str):
+                    h=float(h) if h.strip() !="" else None
+
+                if t:
+                    v0 = t * g / 2
+                if h:
+                    v0 = math.sqrt(2*g*h)
+            
+            if not h:
+                if isinstance(v0,str):
+                    v0 = float(v0) if v0.strip() != "" else None
+                if isinstance(t,str):
+                    t=float(t) if t.strip() != "" else None
+                if isinstance(h,str):
+                    h=float(h) if h.strip() != "" else None
+
+                if v0:
+                    h = (v0**2)/(g*2)
+                if t:
+                    h = (g*(t**2)) / 8
+
+        if isinstance(v0,str):
+            v0 = float(v0) if v0.strip() !="" else None
+        if isinstance(t,str):
+            t = float(t) if t.strip() !="" else None
+
+        v_son = v0 - g*t
+        self.cikti.place(x=30,y=150)
+        self.cikti.delete("1.0",tk.END)
+        self.cikti.insert(tk.END,f"sürtünmelerin önemsenmediği ortamda yukarı atılan cisim için\n\nilk hız:{v0} m/s \n zaman:{t} s \n max yükseklik: {h} m \n son hız:{v_son} m/s")#"\n","ilk hız:",v0,"\n","zaman:",t,"\n","hmax:",h,"\n","son hız:",v_son)
+        self.işleyiş()
+    
+    def egimli_giris(self):
+        self.silmek()
+        self.h_giris.place(x=100,y=5)
+        self.h_label.place(x=30,y=5)
+        self.t_giris.place(x=100,y=30)
+        self.t_label.place(x=30,y=30)
+        self.v0_giris.place(x=100,y=55)
+        self.v0_label.place(x=30,y=55)
+        self.acı_giris.place(x=100,y=80)
+        self.acı_label.place(x=30,y=80)
+        self.menzil_giris.place(x=100,y=105)
+        self.menzil_label.place(x=30,y=105)
+        self.egim_button.place(x=120,y=130)
+        self.çıkış_buton.place(x=300,y=10)
+
+    def egimli_atıs(self):
+        v0 = self.v0_giris.get()
+        h = self.h_giris.get()
+        t = self.t_giris.get()
+        acı = self.acı_giris.get()
+        xmenzil = self.menzil_giris.get()
+        v = acı
+
+
+        while not v0 or not t or not h or not acı or not xmenzil:
+            self.düzen += 1
+            if self.düzen == 20:
+                messagebox.showinfo("UYUARI","girilen değerler birbirini hesaplayamıyor")
+                break
+
+            if acı:
+                if self.çalışmamak != "girilen değerler uyumsuz":
+                    if isinstance(acı,str):
+                        acı = float(acı) if acı.strip() != "" else None
+                    if acı:
+                        acı = np.radians(acı)
+
+                    if acı == 0.6457718232379019:#37 derece
+                        cos = 0.8
+                        sin = 0.6
+                    if acı == 0.9250245035569946:#53 derece
+                        cos = 0.6
+                        sin = 0.8
+                    if acı != 0.9250245035569946 and acı != 0.6457718232379019:
+                        cos = math.cos(acı)
+                        sin = math.sin(acı)
+                    if isinstance(sin,int):
+                        sin = float(sin)
+                    if isinstance(cos,int):
+                        cos = float(cos)
+
+            if not t:
+                if isinstance(t, str) and isinstance(h, str) and isinstance(v0, str) and isinstance(acı, str) and isinstance(xmenzil, str):
+                    t = float(t) if t.strip() != "" else None
+                    h = float(h) if h.strip() != "" else None
+                    acı = float(acı) if acı.strip() != "" else None
+                    v0 = float(v0) if v0.strip() != "" else None
+                    xmenzil = float(xmenzil) if xmenzil.strip() != "" else None
+
+                if isinstance(v0, str):
+                    v0 = float(v0) if v0.strip() != "" else None
+                if v0 and acı:
+                    t = (2 * (v0 * sin)) / g
+                #if self.çalışmamak != "girilen değerler uyumsuz":
+                    
+               
+            if not h:
+                if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(acı,str) and isinstance(xmenzil,str):
+                    t = float(t) if t.strip() !="" else None
+                    h = float(h) if h.strip() !="" else None
+                    acı = float(acı) if acı.strip() !="" else None
+                    v0 = int(v0) if v0.strip() !="" else None
+                    xmenzil = float(xmenzil) if xmenzil.strip() !="" else None
+                
+                if acı and v0:
+                    if isinstance(acı,str):
+                        acı = float(acı) if acı.strip() !="" else None
+                    h = (v0*math.sin(acı)**2 / (2*g))
+
+                if self.çalışmamak != "girilen değerler uyumsuz":
+                    
+                    if acı and v0:
+                        h = (v0 * math.sin(acı))**2 / (2*g) #h = (v0**2 * sin**2) / (2*g) h = 
+                
+
+                
+            if not v0:
+                if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(acı,str) and isinstance(xmenzil,str):
+                    t = float(t) if t.strip() !="" else None
+                    h = float(h) if h.strip() !="" else None
+                    acı = float(acı) if acı.strip() !="" else None
+                    v0 = float(v0) if v0.strip() !="" else None
+                    xmenzil = float(xmenzil) if xmenzil.strip() !="" else None
+                #if acı:    
+                 #   acı = np.radians(acı)
+                
+                if self.çalışmamak != "girilen değerler uyumsuz":
+
+                    if h and acı:
+                        if isinstance(h,str):
+                            h = float(h) if h.strip() !="" else None
+                        v0 = math.sqrt(h*g*2) / sin
+                        v0y = math.sqrt(h * 2*g)
+                    if acı and t:
+                        if isinstance(t,str):
+                            t=float(t)if t.strip() !="" else None
+                        v0 = (t*g)/(math.sin(acı)*2)
+                        print(acı,"h")
+                    #if acı and t:
+                        
+                     #   print(math.sin(acı))
+                      #  v0 = (t* 10) / (2*sin)#math.sin(acı))
+                    if xmenzil and t:
+                        v0x = xmenzil / t
+                
+            
+            if not acı:
+        
+                if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(acı,str) and isinstance(xmenzil,str):
+                    t = float(t) if t.strip() !="" else None
+                    h = float(h) if h.strip() !="" else None
+                    acı = float(acı) if acı.strip() !="" else None
+                    v0 = float(v0) if v0.strip() !="" else None
+                    xmenzil = float(xmenzil) if xmenzil.strip() !="" else None
+                if isinstance(t,str):
+                    t= float(t) if t.strip() !="" else None
+                if isinstance(v0,str):
+                    v0 =float(v0) if v0.strip() !="" else None
+                try:
+                    if t and v0:
+                        acı = (t * g) / v0
+                        acı = math.asin(acı)
+                        acı = math.degrees(acı)
+                    if h and v0:
+                        acı = math.asin(math.sqrt((2*g*h))/v0)
+                        acı = math.degrees(acı)
+                    if xmenzil and v0 and t:
+                        acı = math.acos((xmenzil*v0)/t)
+                        acı = math.degrees(acı)
+                    if xmenzil and v0:
+                        sin20 = (xmenzil * g) / (v0**2)
+                        if 0 <= sin20 <= 1:
+                            radiyan_degeri = math.asin(sin20)
+                            acı = radiyan_degeri / 2
+                            acı = math.degrees(acı)
+                except ValueError:
+                    
+                    self.çalışmamak = "girilen değerler uyumsuz"
+                
+            if not xmenzil:
+                
+                if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(acı,str) and isinstance(xmenzil,str):
+                    t = float(t) if t.strip() !="" else None
+                    h = float(h) if h.strip() !="" else None
+                    acı = float(acı) if acı.strip() !="" else None
+                    v0 = float(v0) if v0.strip() !="" else None
+                    xmenzil = float(xmenzil) if xmenzil.strip() !="" else None
+
+                if isinstance(xmenzil, str) and xmenzil.strip() == "":
+                    xmenzil = None
+                if isinstance(xmenzil, str):
+                    xmenzil = float(xmenzil)
+                if self.çalışmamak == "girilen değerler uyumsuz":
+                    xmenzil = "girilen değerler uyumsuz"
+                
+                if self.çalışmamak != "girilen değerler uyumsuz":
+                    if v0 and acı and t:
+                        xmenzil = (v0 * math.cos(acı)) * t
+                    
+        
+        if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(acı,str) and isinstance(xmenzil,str):
+
+            t = float(t) if t.strip() !="" else None
+            h = float(h) if h.strip() !="" else None
+            acı = float(acı) if acı.strip() !="" else None
+            v0 = float(v0) if v0.strip() !="" else None
+            xmenzil = float(xmenzil) if xmenzil.strip() !="" else None
+            
+        
+        
+        acı = round(math.degrees(acı))
+        """
+        
+        h_tam = h - int(h)
+        t_tam = t - int(t)
+        xmenzil_tam = xmenzil - int(xmenzil)
+        v0_tam = v0 - int(v0)
+        """
+        v_son = round(math.sqrt((v0 * math.cos(acı))**2 + (v0 * math.sin(acı))**2))
+        
+        self.cikti.place(x=30,y=180)
+        self.cikti.delete("1.0",tk.END)
+        if self.çalışmamak == "girilen değerler uyumsuz":
+            
+            self.cikti.insert(tk.END,"girilen değerler birbiriyle uyumsuz")
+            self.çalışmamak = ""
+        
+        if self.çalışmamak != "girilen değerler uyumsuz":
+            self.cikti.insert(tk.END,f"ilk hız{v0} m/s\nzaman {t} s\nyükseklik: {h}m\naçı:{acı}\nyere çarpma hızı:{v_son}\nmenzil:{xmenzil}")
+            #self.cikti.insert(tk.END,f" sürtünmeler önemsiz ortamda\n ilk hız:{int(v0)} m/s \n zaman:{int(t) + round(t_tam,1)} s \n max yükseklik: {int(h) + round(h_tam,1)} m \n son hız:{v_son} m/s \n atış açısı:{yazdır_acı} \n menzil:{int(xmenzil) + round(xmenzil_tam,1)} m ")
+    def yükseklik_atıs_giris(self):
+        self.silmek()
+        self.h_giris.place(x=100,y=5)
+        self.h_label.place(x=30,y=5)
+        self.t_giris.place(x=100,y=30)
+        self.t_label.place(x=30,y=30)
+        self.v0_giris.place(x=100,y=55)
+        self.v0_label.place(x=30,y=55)
+        self.menzil_giris.place(x=100,y=80)
+        self.menzil_label.place(x=30,y=80)
+        self.yükseklik_buton.place(x=120,y=105)
+    
+    def yükseklik_atıs(self):
+        h = self.h_giris.get()
+        t = self.t_giris.get()
+        v0 = self.v0_giris.get()
+        menzil = self.menzil_giris.get()
+        self.düzen = 0
+
+        while not h or not t or not v0 or not menzil:
+            self.düzen += 1
+            if self.düzen == 20:
+                break
+            if not h:
+                if isinstance(t,str) and isinstance(menzil,str) and isinstance(v0,str):
+                    t = float(t) if t.strip() != "" else None
+                    menzil = float(menzil) if menzil.strip() !="" else None
+                    v0 = float(v0) if v0.strip() != "" else None
+
+                if t:
+                    h = 1/2 * g * t**2
+                if v0 and menzil:
+                    h = 1/2 * g * (menzil/v0)**2
+                
+            
+            if not t:
+                if isinstance(menzil,str) and isinstance(h,str) and isinstance(v0,str):
+                    menzil = float(menzil) if menzil.strip() != "" else None
+                    v0 = float(v0) if v0.strip() != "" else None
+                    h = float(h) if h.strip() != "" else None
+                
+                if menzil and v0:
+                    t = menzil / v0
+                if h:
+                    t = math.sqrt(2 * h /g)
+
+            if not menzil:
+                if isinstance(h,str) and isinstance(v0,str):
+                    t = float(t) if t.strip() != "" else None
+                    h = float(h) if h.strip() != "" else None
+
+                if t and v0:
+                    menzil = v0 * t
+                if h and v0:
+                    menzil = v0 * math.sqrt(2*h/g)
+            if not v0: 
+                if isinstance(menzil,str) and isinstance(h,str) and isinstance(t,str):
+                    menzil = int(menzil) if menzil.strip() != "" else None
+                    t = float(t) if t.strip() != "" else None
+                    h = float(h) if h.strip() != "" else None
+
+                if menzil and t:
+                    v0 = menzil/t
+        
+        if t == None or h == None or menzil == None or v0 == None:
+            self.çalışmamak = "girilen değerler uyumsuz"
+            
+        if isinstance(t,str) and isinstance(h,str) and isinstance(v0,str) and isinstance(menzil,str):
+
+            t = float(t) if t.strip() !="" else None
+            h = float(h) if h.strip() !="" else None
+            v0 = float(v0) if v0.strip() !="" else None
+            menzil = float(menzil) if menzil.strip() !="" else None
+            
+        
+        if self.çalışmamak == "girilen değerler uyumsuz":
+            messagebox.showinfo("hata","girilen değerler birbirini hesaplayamıyor")
+            self.çalışmamak = ""
+            
+        if self.çalışmamak != "girilen değerler uyumsuz":
+            self.cikti.place(x=30,y=180)
+            self.cikti.delete("1.0",tk.END)
+            self.cikti.insert(tk.END,f"sürtünmelerin önemsenmediği ortamda bir yükseklikten ileri atılan cisim için\n\nilk hız:{v0} m/s \n zaman: {t} s \n yükseklik: {h} m \n menzil: {menzil} m \n son hız: {math.sqrt((g*t)**2 + v0**2)} m/s")
+        self.işleyiş()
+                                    
+    def işleyiş(self):
+        iş = self.seçim_kutusu.get()
+        if iş == "yukarı yönde atış":
+            self.yukarı_atıs_giris()
+            iş = ""
+        if iş == "aşağı yönde atış":
+            self.aşağı_yönde_giris()
+            iş = ""
+        if iş == "eğimli yatay atış":
+            self.egimli_giris()
+            iş = ""
+        if iş == "bir yükseklikten atış":
+            self.yükseklik_atıs_giris()
+            iş = ""
+
+proje = ana_işlev()
+
+proje.işlev_seçimi()
+ekran.mainloop()
